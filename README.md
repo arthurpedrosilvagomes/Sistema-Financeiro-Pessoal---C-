@@ -1,2 +1,9 @@
-# Sistema-Financeiro-Pessoal---C-
-Projeto Academico: Sistema Financeiro Pessoal feito em C++ utilizando paradigmas de programação orientada a objeto
+# Sistema-Financeiro-Pessoal---C++
+
+Instituição: UNIMA | Afya
+Autor: Arthur Pedro Silva Gomes
+Curso: Ciência da Computação
+Periodo: 1º
+
+Sobre:
+Projeto da disciplina de algorítmo e programação. Envio até dia 13/04
