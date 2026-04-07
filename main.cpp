@@ -21,9 +21,12 @@ Pontuação referente ao roterio de atividades N1
 
 */
 
-//bibliotecas utilizadas no aplicativo
-#include <iostream> // gerenciador de entrada e saida de valores
-#include <vector> // gerenciador de vetores
+// bibliotecas utilizadas no aplicativo
+#include <iostream>
+#include <vector>
+#ifdef _WIN32
+#include <windows.h>
+#endif
 
 // estrutura que representa a transação
 struct Transacao {
@@ -57,12 +60,12 @@ public:
         std::string descricao, categoria, data;
 
         // Entrada de valor do usuário para a variavel descricao
-        std::cout << "Informe a descrição dessa transação: ";
+        std::cout << "Informe a descrição dessa transação (transporte, Alimentação, Salario, Conta, etc): ";
         std::cin >> descricao;
         transacao.descricao = descricao;
 
         // Entrada de valor do usuário para a variável categoria
-        std::cout << "Informe a categoria dessa transação: ";
+        std::cout << "Informe a categoria dessa transação (Fixo ou Variável): ";
         std::cin >> categoria;
         transacao.categoria = categoria;
 
@@ -86,25 +89,22 @@ public:
             // Entrada de valor para a variavel entrada
             std::cin >> entrada;
 
-            // Se o valor recebido for 1
-            if (entrada == 1) {
+            switch (entrada) {
 
-                // definir o valor entrada da transacao como true
-                transacao.entrada = true;
-            }
-
-            // Se o valor recebido for 2
-            else if (entrada == 2) {
-
-                // definir o valor entrada da transacao como false
-                transacao.entrada = false;
-            }
-
-            // Se o valor recebido não for nenhum dos dois esperados
-            else {
-
-                // Mensagem de instrução
-                std::cout << "Insira apenas os valores que foram exibidos" << std::endl;
+                // Receita
+                case 1:
+                    transacao.entrada = true;
+                    break;
+                
+                // Despesa
+                case 2:
+                    transacao.entrada = false;
+                    break;
+                
+                // Exceção caso o usuário selecione um numero não exibido
+                default:
+                    std::cout << "Selecione apenas um dos valores exibidos!" << std::endl;
+                    break;
             }
         }
         
@@ -128,37 +128,30 @@ public:
         if (transacoes.size() == 0) {
 
             // Mensagem que alerta sobre a ausencia de transações
-            std::cout << "Você não tem transações ainda" << std::endl;
+            std::cout << "Você não tem transações ainda\n" << std::endl;
         }
 
         // Caso haja transações na lista
         else {
 
-            // Repetição que analisa as transações que estão na lista
-            for (const auto& t: transacoes) {
+            // Loop que interage na lista de transações
+            for (int i = 0; i < transacoes.size(); i++) {
 
-            // Condicional que analisa a entrada da transação
-            if (t.entrada) {
+                // Condicional que analisa a entrada da transação
+                if (transacoes[i].entrada == true) {
+                    std::cout << i + 1 << ": Receita";
+                }
 
-                // Exibirá Receita se o valor da variavel entrada for true
-                std::cout << "=== Receita ===" << std::endl;
-            } else {
+                // Caso o valor da entrada seja false
+                else {
+                    std::cout << i + 1 << ": Despesa";
+                }
 
-                // Exibirá Despesa se o valor da variavel entrada for false
-                std::cout << "=== Despesa ===" << std::endl;
-            }
-
-            // Exibir descrição
-            std::cout << "Descrição: " << t.descricao << std::endl;
-
-            // Exibir categoria
-            std::cout << "Categoria: " << t.categoria << std::endl;
-
-            // Exibir data
-            std::cout << "Data: " << t.data << std::endl;
-
-            // Exibir valor
-            std::cout << "Valor " << t.valor << "(TRABALHO EM ANDAMENTO)\n" << std::endl;
+                // Resto dos valores das transações serão exibidas
+                std::cout << " - " << transacoes[i].categoria
+                          << " - " << transacoes[i].descricao
+                          << " - " << transacoes[i].data
+                          << " - " << transacoes[i].valor << std::endl;
             }
         }
     }
@@ -192,12 +185,42 @@ public:
 
     // Método para eliminar uma transação na lista transacoes
     void eliminar_transacao() {
-        
+
+        // Exibição das transações
+        mostrar_transacoes();
+
+        // Condicional que analisa se existe transações na lista
+        if (transacoes.size() != 0) {
+
+            // Variavel que vai guardar a posição da transação a ser eliminada
+            int pos_transacao;
+
+            // Entrada de valor do usuário
+            std::cout << "Selecione a posição da transação que deseja remover: ";
+            std::cin >> pos_transacao;
+
+            // Condicional que analisa a posição da transação
+            if (0 < pos_transacao <= transacoes.size()) {
+                transacoes.erase(transacoes.begin() + (pos_transacao - 1));
+                std::cout << "transacao eliminada com sucesso!\n" << std::endl;
+            }
+
+            // Caso ela não exista
+            else {
+                std::cout << "Não foi possivel eliminar a transação desejada!\n" << std::endl;
+            }
+        }
     }
 };
 
 // Bloco onde tudo vai ser executado
 int main() {
+
+    // Correção para a codificação padrão UTF-8. Analise só será feita no windows
+    #ifdef _WIN32
+    SetConsoleOutputCP(CP_UTF8);
+    SetConsoleCP(CP_UTF8);
+    #endif
 
     // Variavel que guarda o valor de entrada do usuário
     int escolha_do_usuario;
@@ -215,43 +238,36 @@ int main() {
                   << "[0] Sair" << std::endl
                   << ">>> ";
         std::cin >> escolha_do_usuario;
+        std::cout << std::endl;
 
         // Condicionais que fazem uma execução de acordo com o valor da variavel escolha_do_usuario
         switch (escolha_do_usuario) {
 
             // Adiciona uma transação
             case 1:
-
-                // Método adicionar_transacao da classe Conta sendo chamado na variavel conta
                 conta.adicionar_transacao();
                 break;
             
             // Mostra todas as transações feitas
             case 2:
-                
-                // Método mostrar_transacoes da classe Conta sendo chamado na variavel conta
                 conta.mostrar_transacoes();
                 break;
             
             // Visualiza o saldo de acordo com as transações feitas
             case 3:
-                
-                // Método calcular_saldo da classe Conta sendo chamado na variavel conta
                 conta.calcular_saldo();
                 break;
             
             // Remove uma transação da lista de transações
             case 4:
+                conta.eliminar_transacao();
                 break;
             
             // Exceção para todo valor que não foi apresentado
             default:
-
-                // Mensagem de instrução
                 std::cout << "selecione apenas os valores exibidos" << std::endl;
         }
     }
     
-    // finalização da execução do aplicativo
     return 0;
 }
